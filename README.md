@@ -47,7 +47,7 @@ Clone the repository:
 bash
 Copy
 Edit
-git clone https://github.com/your-username/ai-notes-summarizer.git
+git clone https://github.com/madebywahab/ai-note-organizer-app
 cd ai-notes-summarizer
 Open index.html in any modern browser.
 

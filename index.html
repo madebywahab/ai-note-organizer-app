@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Notes Organizer</title>
+    <script defer src="script.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        color: white;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .input-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .api-section {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .api-input {
+        flex: 1;
+        min-width: 300px;
+        padding: 10px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        font-size: 14px;
+      }
+
+      .api-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .api-help {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #8b4513;
+      }
+
+      .api-help a {
+        color: #d2691e;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      .input-area {
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 150px;
+        padding: 20px;
+        font-size: 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        resize: vertical;
+        font-family: inherit;
+        transition: all 0.3s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .button-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 16px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .clear-btn {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      }
+
+      .clear-btn:hover {
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
+      }
+
+      .note-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .note-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .note-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .note-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .note-date {
+        font-size: 0.9rem;
+        color: #666;
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 15px;
+      }
+
+      .note-content {
+        line-height: 1.6;
+        color: #444;
+      }
+
+      .note-content h2 {
+        color: #495057;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 5px;
+        margin: 20px 0 15px 0;
+        font-size: 1.1rem;
+      }
+
+      .note-content ul {
+        margin: 10px 0;
+        padding-left: 20px;
+      }
+
+      .note-content li {
+        margin: 8px 0;
+        position: relative;
+      }
+
+      .note-content li::marker {
+        color: #667eea;
+      }
+
+      .note-actions {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        gap: 10px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .note-card:hover .note-actions {
+        opacity: 1;
+      }
+
+      .action-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .action-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .delete-btn {
+        color: #ff6b6b;
+      }
+
+      .copy-btn {
+        color: #4ecdc4;
+      }
+
+      .edit-btn {
+        color: #45b7d1;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .empty-state h3 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+      }
+
+      .empty-state p {
+        font-size: 1.1rem;
+        opacity: 0.8;
+      }
+
+      .stats-bar {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 15px 25px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .loading {
+        color: #6c757d;
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .error {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        padding: 15px;
+        border-radius: 10px;
+        margin: 10px 0;
+      }
+
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      }
+
+      .toast.show {
+        transform: translateX(0);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .input-section {
+          padding: 20px;
+        }
+
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .api-section {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .api-input {
+          min-width: auto;
+        }
+
+        .button-group {
+          justify-content: center;
+        }
+
+        .stats-bar {
+          justify-content: center;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🧠 AI Notes Organizer by Wahab wali khan</h1>
+        <p>
+          Transform your cluttered thoughts into organized, actionable notes
+        </p>
+      </div>
+
+      <div class="input-section">
+        <div class="api-section">
+          <input
+            type="password"
+            id="apiKey"
+            class="api-input"
+            placeholder="🔑 Enter your OpenRouter API key (optional)"
+          />
+        </div>
+
+        <div class="api-help">
+          <strong>💡 How AI Analysis Works:</strong>
+          • <strong>With API Key:</strong> GPT-4 analyzes context,
+          relationships, priorities, and creates intelligent categories •
+          <strong>Demo Mode:</strong> Smart categorization mimics AI analysis
+          patterns • Get your key from
+          <a href="https://openrouter.ai/keys" target="_blank"
+            >openrouter.ai/keys</a
+          >
+        </div>
+
+        <div class="input-area">
+          <textarea
+            id="input"
+            placeholder="🗯️ Dump all your cluttered thoughts here...
+
+Examples:
+• Meeting with Sarah tomorrow at 3pm about project
+• Buy groceries: milk, bread, eggs, coffee
+• Call dentist to schedule appointment
+• Project deadline next Friday - need to finish presentation
+• Mom's birthday on 15th - buy gift
+• Fix broken kitchen faucet
+• Pay electricity bill by Thursday"
+          ></textarea>
+        </div>
+
+        <div class="button-group">
+          <button onclick="organizeNotes()">✨ Organize My Thoughts</button>
+          <button onclick="clearInput()" class="clear-btn">
+            🗑️ Clear Input
+          </button>
+        </div>
+      </div>
+
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+          <span>📊</span>
+          <span id="noteCount">0 notes saved</span>
+        </div>
+        <div class="stat-item">
+          <span>💾</span>
+          <span>Auto-saved locally</span>
+        </div>
+        <div class="stat-item">
+          <span>🎯</span>
+          <span>Organize your mind</span>
+        </div>
+      </div>
+
+      <div id="notesContainer">
+        <div class="empty-state" id="emptyState">
+          <h3>🧠 AI-Powered Mind Organization</h3>
+          <p>
+            Let AI analyze your cluttered thoughts and transform them into
+            intelligent, context-aware organized notes with priority insights!
+          </p>
+        </div>
+      </div>
+
+      <div class="notes-grid" id="notesGrid"></div>
+    </div>
+  </body>
+</html>

@@ -1,4 +1,7 @@
 # ai-note-organizer-app
+## Live Link:
+https://madebywahab.github.io/ai-note-organizer-app/
+
 🧠 AI Notes Summarizer
 Transform cluttered thoughts into clean, categorized study notes with AI.
 Created by Wahab Wali Khan
